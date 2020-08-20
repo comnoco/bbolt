@@ -425,7 +425,7 @@ func (db *DB) mmapSize(size int) (int, error) {
 // init creates a new database file and initializes its meta pages.
 func (db *DB) init() error {
 	// Create two meta pages on a buffer.
-	buf := make([]byte, db.pageSize*4)
+	buf := make([]byte, db.pageSize*8)
 	for i := 0; i < 2; i++ {
 		p := db.pageInBuffer(buf[:], pgid(i))
 		p.id = pgid(i)
