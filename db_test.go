@@ -66,6 +66,10 @@ func TestOpen(t *testing.T) {
 // Regression validation for https://github.com/etcd-io/bbolt/pull/122.
 // Tests multiple goroutines simultaneously opening a database.
 func TestOpen_MultipleGoroutines(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
 	const (
 		instances  = 30
 		iterations = 30
@@ -391,7 +395,7 @@ func TestOpen_FileTooSmall(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	db, err = bolt.Open(path, 0666, nil)
+	_, err = bolt.Open(path, 0666, nil)
 	if err == nil || err.Error() != "file size too small" {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -1122,7 +1126,7 @@ func TestDB_Batch(t *testing.T) {
 
 	// Iterate over multiple updates in separate goroutines.
 	n := 2
-	ch := make(chan error)
+	ch := make(chan error, n)
 	for i := 0; i < n; i++ {
 		go func(i int) {
 			ch <- db.Batch(func(tx *bolt.Tx) error {
